@@ -1,0 +1,15 @@
+{
+    "vcf"       : "$SCRATCH/toy-datasets/vcf-sarek/pheno.variants.vcf.gz{,.tbi}",
+    "cases"     : "$SCRATCH/toy-datasets/vcf-sarek/pheno.cases.txt",
+    "genome"    : "hg38",
+    "style"     : "NCBI",
+    "GQ"        : 30,
+    "DP"        : 10,
+    "VAF"       : 0.4,
+    "MAF"       : 0.005,
+    "HWE"       : 1e-5,
+    "ExcHet"    : 0.9,
+    "gnomADe_AF": 0.005,
+    "MAX_AF"    : 0.005,
+    "DS"        : 0.8
+}
