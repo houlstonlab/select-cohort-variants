@@ -6,17 +6,21 @@
 #SBATCH -p master-worker
 #SBATCH -t 120:00:00
 
-# Create and move to test directory
-mkdir -p test/
+# Setup test directory
+mkdir -p test/ test/input
 cd test/
 
-# Load required modules
-module load Nextflow/24.04.2
+# Download test data
+URL="https://figshare.com/ndownloader/files"
 
-# Run nextflow
-nextflow run houlstonlab/select-cohort-variants -r main \
+wget -c $URL/50383353 -O input/pheno.variants.vcf.gz
+wget -c $URL/50383350 -O input/pheno.variants.vcf.gz.tbi
+wget -c $URL/50385591 -O input/pheno.cases.txt
+
+# nextflow run houlstonlab/select-cohort-variants -r main \
+nextflow run ../main.nf \
     --output_dir ./results/ \
-    -profile local,test \
+    -profile cluster,gha \
     -resume
 
 # usage: nextflow run [ local_dir/main.nf | git_url ]  

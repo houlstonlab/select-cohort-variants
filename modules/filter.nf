@@ -1,14 +1,15 @@
 process FILTER {
     tag "${chrom}:${category}"
 
-    label 'simple'
+    label 'heavy'
 
     container params.bcftools
 
     publishDir("${params.output_dir}/filtered/", mode: 'copy')
 
     input:
-    tuple val(pheno), val(chrom), path(file), path(index),
+    tuple val(pheno), val(chrom),
+          path(file), path(index),
           val(category)
 
     output:

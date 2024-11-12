@@ -10,7 +10,7 @@ include { AGGREGATE }   from './modules/aggregate.nf'
 include { REPORT }      from './modules/report.nf'
 
 // Define input channels
-genes_coords_ch =  Channel.of (1, 11)
+genes_coords_ch =  Channel.of (1..22, 'X', 'Y')
     | map { [ "chr${it}", params.genome, params.style ] }
 
 variants_ch = Channel.fromFilePairs(params.vcf, flat: true)
@@ -18,7 +18,7 @@ variants_ch = Channel.fromFilePairs(params.vcf, flat: true)
 cases_ch = Channel.fromPath(params.cases)
     | map { [it.simpleName, it] }
 
-category_ch = Channel.of( 'Pathogenic', 'Damaging', 'Splicing' )
+category_ch = Channel.of( 'Pathogenic', 'Splicing' )
 variable_ch = Channel.of( 'variants', 'annotations', 'genotypes', 'frequency' )
 
 workflow  {
@@ -26,8 +26,10 @@ workflow  {
     // Subset, Filter and Extract qualifying variants
     genes_coords_ch
         | COORDINATES
-        | combine(variants_ch)
-        | combine(cases_ch)
+
+    variants_ch
+        | combine(cases_ch, by: 0)
+        | combine(COORDINATES.out)
         | SUBSET
         | combine(category_ch)
         | FILTER

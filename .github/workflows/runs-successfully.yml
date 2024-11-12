@@ -1,0 +1,36 @@
+name: Runs successfully
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - 'releases/**'
+  pull_request:
+    branches:
+      - main
+      - dev
+      - 'releases/**'
+
+jobs:
+  try-run:
+    name: Try running the pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v2
+
+      - name: Set up Singularity
+        uses: eWaterCycle/setup-singularity@v6
+      
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Run pipeline
+        run: |
+         chmod +x test-submit.sh
+         sh test-submit.sh
+        shell: bash

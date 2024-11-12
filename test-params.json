@@ -1,8 +1,8 @@
 {
-    "vcf"       : "$SCRATCH/toy-datasets/vcf-sarek/pheno.variants.vcf.gz{,.tbi}",
-    "cases"     : "$SCRATCH/toy-datasets/vcf-sarek/pheno.cases.txt",
+    "vcf"       : "$TOY_DATASETS/wes-sarek/*.variants.vcf.gz{,.tbi}",
+    "cases"     : "$TOY_DATASETS/wes-sarek/*.cases.txt",
     "genome"    : "hg38",
-    "style"     : "NCBI",
+    "style"     : "UCSC",
     "GQ"        : 30,
     "DP"        : 10,
     "VAF"       : 0.4,
