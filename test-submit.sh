@@ -20,7 +20,7 @@ wget -c $URL/50385591 -O input/pheno.cases.txt
 # nextflow run houlstonlab/select-cohort-variants -r main \
 nextflow run ../main.nf \
     --output_dir ./results/ \
-    -profile cluster,gha \
+    -profile local,gha \
     -resume
 
 # usage: nextflow run [ local_dir/main.nf | git_url ]  
