@@ -3,7 +3,7 @@ process COORDINATES {
 
     label 'simple'
 
-    container  params.bioconductor
+    container params.bioconductor
 
     publishDir("${params.output_dir}/coordiantes", mode: 'copy')
 

@@ -8,14 +8,13 @@ process SUBSET {
     publishDir("${params.output_dir}/cohort", mode: 'symlink')
 
     input:
-    tuple val(chrom), path(gene_coords),
-          val(cohort), path(cohort_file), path(cohort_index),
-          val(pheno), path(pheno_file)
+    tuple val(chrom), path(file), path(index),
+          path(gene_coords)
 
     output:
-    tuple val(pheno), val(chrom),
-          path("${pheno}.${chrom}.vcf.gz"),
-          path("${pheno}.${chrom}.vcf.gz.tbi")
+    tuple val(chrom),
+          path("gnomad.${chrom}.vcf.gz"),
+          path("gnomad.${chrom}.vcf.gz.tbi")
 
     script:
     """
@@ -32,8 +31,8 @@ process SUBSET {
     bcftools +setGT -- -t . -n 0 | \
     bcftools +setGT -- -t q -n 0 -i 'FMT/GQ < ${params.GQ} | FMT/DP < ${params.DP} | VAF < ${params.VAF}' | \
     bcftools +fill-tags -- -t all | \
-    bcftools view -g het --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.vcf.gz
+    bcftools view -g het --threads ${task.cpu} -Oz -o gnomad.${chrom}.vcf.gz
 
-    tabix ${pheno}.${chrom}.vcf.gz
+    tabix gnomad.${chrom}.vcf.gz
     """
 }

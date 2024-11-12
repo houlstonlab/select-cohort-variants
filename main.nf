@@ -6,7 +6,6 @@ include { COORDINATES } from './modules/coordinates.nf'
 include { SUBSET }      from './modules/subset.nf'
 include { FILTER }      from './modules/filter.nf'
 include { EXTRACT }     from './modules/extract.nf'
-// include { TABULATE }    from './modules/tabulate.nf'
 include { AGGREGATE }   from './modules/aggregate.nf'
 include { REPORT }      from './modules/report.nf'
 
