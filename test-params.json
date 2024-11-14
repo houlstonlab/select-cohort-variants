@@ -11,5 +11,6 @@
     "ExcHet"    : 0.9,
     "gnomADe_AF": 0.005,
     "MAX_AF"    : 0.005,
-    "DS"        : 0.8
+    "DS"        : 0.8,
+    "CADD"      : 5
 }

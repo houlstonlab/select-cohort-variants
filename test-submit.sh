@@ -13,9 +13,12 @@ cd test/
 # Download test data
 URL="https://figshare.com/ndownloader/files"
 
-wget -c $URL/50383353 -O input/pheno.variants.vcf.gz
-wget -c $URL/50383350 -O input/pheno.variants.vcf.gz.tbi
+wget -c $URL/50487621 -O input/pheno.variants.vcf.gz
+wget -c $URL/50487624 -O input/pheno.variants.vcf.gz.tbi
 wget -c $URL/50385591 -O input/pheno.cases.txt
+
+# Run nextflow
+module load Nextflow
 
 # nextflow run houlstonlab/select-cohort-variants -r main \
 nextflow run ../main.nf \

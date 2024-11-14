@@ -27,9 +27,9 @@ process FILTER {
         bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
         bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
         bcftools view -i 'CLIN_SIG ~ "pathogenic" || CLIN_SIG ~ "likely_pathogenic"' | \
-        bcftools view -e 'gnomADe_AF > 0.01 || MAX_AF > 0.01' | \
+        bcftools view -e 'gnomADe_AF > ${params.PAF} || MAX_AF > ${params.PAF}' | \
         bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
-        bcftools view -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
+        bcftools view --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
@@ -43,10 +43,10 @@ process FILTER {
         bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
         bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
         bcftools view -i 'IMPACT="HIGH"' | \
-        bcftools view -i 'CADD_PHRED > 30' | \
+        bcftools view -i 'CADD_PHRED > ${params.CADD}' | \
         bcftools view -e 'gnomADe_AF > ${params.gnomADe_AF} || MAX_AF > ${params.MAX_AF}' | \
         bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
-        bcftools view -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
+        bcftools view --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
@@ -62,7 +62,7 @@ process FILTER {
         bcftools view -i 'SpliceAI_pred_DS_AG > ${params.DS} || SpliceAI_pred_DS_AL > ${params.DS} || SpliceAI_pred_DS_DG > ${params.DS} || SpliceAI_pred_DS_DL > ${params.DS}' | \
         bcftools view -e 'gnomADe_AF > ${params.gnomADe_AF} || MAX_AF > ${params.MAX_AF}' | \
         bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
-        bcftools view -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
+        bcftools view --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
