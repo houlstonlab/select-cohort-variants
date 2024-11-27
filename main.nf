@@ -5,6 +5,7 @@ nextflow.enable.dsl=2
 include { COORDINATES } from './modules/coordinates.nf'
 include { SUBSET }      from './modules/subset.nf'
 include { FILTER }      from './modules/filter.nf'
+include { COMBINE }     from './modules/combine.nf'
 include { EXTRACT }     from './modules/extract.nf'
 include { AGGREGATE }   from './modules/aggregate.nf'
 include { REPORT }      from './modules/report.nf'
@@ -35,31 +36,23 @@ workflow  {
         | SUBSET
         | combine(category_ch)
         | FILTER
+        | groupTuple(by: [0,2])
+        | COMBINE
         | combine(variable_ch)
         | EXTRACT
-        | filter { it[3] == 'frequency' }
+        | filter { it[2] == 'frequency' }
         | multiMap {
             cat: it
-            all: [it[0], it[1], 'ALL', it[3], it[4]]
+            all: [it[0], 'ALL', it[2], it[3]]
         } 
         | set { variants }
 
     // Concatenate and group genotypes by category or 'all'
     variants.cat 
         | concat(variants.all) 
-        | groupTuple(by: [0,1,2,3])
+        | groupTuple(by: [0,1,2])
         | AGGREGATE
 
     // Stats
-    FILTER.out | REPORT
-
-    // Collect and store the summary files
-    EXTRACT.out
-        | concat(AGGREGATE.out)
-        | concat(REPORT.out)
-        | collectFile (
-            keepHeader: true,
-            storeDir: "${params.output_dir}/summary",
-        )
-        { item -> [ "${item[0]}.${item[2]}.${item[3]}.tsv", item.last() ] } 
+    COMBINE.out | REPORT
 }
