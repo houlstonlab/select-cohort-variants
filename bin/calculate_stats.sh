@@ -1,8 +1,7 @@
 #!/bin/bash
 pheno=$1
-chrom=$2
-category=$3
-file=$4
+category=$2
+file=$3
 
 # TODO: write functions to calculate the rest of the statistics
 # Function to query bcftools and get the maximum value

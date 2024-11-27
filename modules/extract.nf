@@ -1,5 +1,5 @@
 process EXTRACT {
-    tag "${chrom}:${category}"
+    tag "${pheno}:${category}"
 
     label 'simple'
 
@@ -8,13 +8,13 @@ process EXTRACT {
     publishDir("${params.output_dir}/variants", mode: 'copy')
 
     input:
-    tuple val(pheno), val(chrom), val(category),
+    tuple val(pheno), val(category),
           path(file), path(index), path(variants),
           val(variable)
 
     output:
-    tuple val(pheno), val(chrom), val(category), val(variable),
-	      path("${pheno}.${chrom}.${category}.${variable}.tsv")
+    tuple val(pheno), val(category), val(variable),
+	      path("${pheno}.${category}.${variable}.tsv")
 
     script:
     if ( variable == 'variants' ) {
@@ -25,7 +25,7 @@ process EXTRACT {
 			-c SYMBOL \
 			-f '%SYMBOL\t%CHROM:%POS:%REF:%ALT\n' \
 			${file} \
-			> "${pheno}.${chrom}.${category}.${variable}.tsv"
+			> "${pheno}.${category}.${variable}.tsv"
 		"""
     } else if ( variable == 'annotations' ) {
 		"""
@@ -36,7 +36,7 @@ process EXTRACT {
 			-f '%SYMBOL\t%CHROM:%POS:%REF:%ALT\t%CSQ\n' \
 			-d -A tab \
 			${file} \
-			> "${pheno}.${chrom}.${category}.${variable}.tsv"
+			> "${pheno}.${category}.${variable}.tsv"
 		"""
     } else if ( variable == 'genotypes' ) {
 		"""
@@ -46,7 +46,7 @@ process EXTRACT {
 			-c SYMBOL \
 			-f '%SYMBOL\t%CHROM:%POS:%REF:%ALT[\t%SAMPLE=%GT]\n' \
 			${file} \
-			> "${pheno}.${chrom}.${category}.${variable}.tsv"
+			> "${pheno}.${category}.${variable}.tsv"
 		"""
     } else if ( variable == 'frequency' ) {
 		"""
@@ -57,7 +57,7 @@ process EXTRACT {
 			-f '%SYMBOL\t%CHROM:%POS:%REF:%ALT[\t%SAMPLE=%GT]\n' \
 			${file} | \
 			summarize_genotypes.awk \
-			> "${pheno}.${chrom}.${category}.${variable}.tsv"
+			> "${pheno}.${category}.${variable}.tsv"
 		"""
     } 
 }
