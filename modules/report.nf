@@ -1,5 +1,5 @@
 process REPORT {
-    tag "${chrom}:${category}"
+    tag "${pheno}:${category}"
 
     label 'simple'
 
@@ -8,19 +8,18 @@ process REPORT {
     publishDir("${params.output_dir}/reports", mode: 'copy')
 
     input:
-    tuple val(pheno), val(chrom), val(category),
+    tuple val(pheno), val(category),
           path(file), path(index), path(variants)
 
     output:
-    tuple val(pheno), val(chrom), val(category), val('report'),
-          path("${pheno}.${chrom}.${category}.report.txt")
+    tuple val(pheno), val(category), val('report'),
+          path("${pheno}.${category}.report.txt")
 
     script:
     """
     #!/bin/bash
     calculate_stats.sh \
-        ${pheno} ${chrom} ${category} \
-        ${file} \
-        > ${pheno}.${chrom}.${category}.report.txt
+        ${pheno} ${category} ${file} \
+        > ${pheno}.${category}.report.txt
     """
 }
