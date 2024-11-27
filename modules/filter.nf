@@ -1,7 +1,7 @@
 process FILTER {
     tag "${chrom}:${category}"
 
-    label 'heavy'
+    label 'simple'
 
     container params.bcftools
 
@@ -44,6 +44,54 @@ process FILTER {
         bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
         bcftools view -i 'IMPACT="HIGH"' | \
         bcftools view -i 'CADD_PHRED > ${params.CADD}' | \
+        bcftools view -e 'gnomADe_AF > ${params.gnomADe_AF} || MAX_AF > ${params.MAX_AF}' | \
+        bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
+        bcftools view --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
+
+        tabix ${pheno}.${chrom}.${category}.vcf.gz
+
+        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        """
+    } else if ( category == 'High' ) {
+        """
+        #!/bin/bash
+        # Filter cohort
+        bcftools +split-vep -s worst -c CLIN_SIG,IMPACT,CADD_PHRED:Float,gnomADe_AF:Float,MAX_AF:Float ${file} | \
+        bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
+        bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
+        bcftools view -i 'IMPACT="HIGH"' | \
+        bcftools view -e 'gnomADe_AF > ${params.gnomADe_AF} || MAX_AF > ${params.MAX_AF}' | \
+        bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
+        bcftools view --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
+
+        tabix ${pheno}.${chrom}.${category}.vcf.gz
+
+        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        """
+    } else if ( category == 'Stop' ) {
+        """
+        #!/bin/bash
+        # Filter cohort
+        bcftools +split-vep -s worst -c CLIN_SIG,IMPACT,Consequence,CADD_PHRED:Float,gnomADe_AF:Float,MAX_AF:Float ${file} | \
+        bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
+        bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
+        bcftools view -i 'Consequence~"stop_gained"' | \
+        bcftools view -e 'gnomADe_AF > ${params.gnomADe_AF} || MAX_AF > ${params.MAX_AF}' | \
+        bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
+        bcftools view --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
+
+        tabix ${pheno}.${chrom}.${category}.vcf.gz
+
+        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        """
+    } else if ( category == 'PTV' ) {
+        """
+        #!/bin/bash
+        # Filter cohort
+        bcftools +split-vep -s worst -c CLIN_SIG,IMPACT,Consequence,CADD_PHRED:Float,gnomADe_AF:Float,MAX_AF:Float ${file} | \
+        bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
+        bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
+        bcftools view -i 'Consequence~"stop_gained" || Consequence~"frameshift_variant" || Consequence~"splice_acceptor_variant"' | \
         bcftools view -e 'gnomADe_AF > ${params.gnomADe_AF} || MAX_AF > ${params.MAX_AF}' | \
         bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
         bcftools view --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.${category}.vcf.gz

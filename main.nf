@@ -18,9 +18,9 @@ variants_ch = Channel.fromFilePairs(params.vcf, flat: true)
 cases_ch = Channel.fromPath(params.cases)
     | map { [it.simpleName, it] }
 
-// TODO: Expand categories
-// TODO: Utilize the all category
-category_ch = Channel.of( 'Pathogenic', 'Damaging', 'Splicing', 'NotScored', 'Scored' )
+category_ch = Channel.of( 'Pathogenic', 'Damaging', 'Splicing',
+                        //   'NotScored', 'Scored',
+                          'High', 'PTV', 'Stop' )
 variable_ch = Channel.of( 'variants', 'annotations', 'genotypes', 'frequency' )
 
 workflow  {
