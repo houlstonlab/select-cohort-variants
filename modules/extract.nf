@@ -22,8 +22,8 @@ process EXTRACT {
 		#!/bin/bash
 		bcftools +split-vep \
 			-s worst \
-			-c SYMBOL \
-			-f '%SYMBOL\t%CHROM:%POS:%REF:%ALT\n' \
+			-c Gene \
+			-f '%Gene\t%CHROM:%POS:%REF:%ALT\n' \
 			${file} \
 			> "${pheno}.${category}.${variable}.tsv"
 		"""
@@ -32,8 +32,8 @@ process EXTRACT {
 		#!/bin/bash
 		bcftools +split-vep \
 			-s worst \
-			-c SYMBOL \
-			-f '%SYMBOL\t%CHROM:%POS:%REF:%ALT\t%CSQ\n' \
+			-c Gene \
+			-f '%Gene\t%CHROM:%POS:%REF:%ALT\t%CSQ\n' \
 			-d -A tab \
 			${file} \
 			> "${pheno}.${category}.${variable}.tsv"
@@ -43,8 +43,8 @@ process EXTRACT {
 		#!/bin/bash
 		bcftools +split-vep \
 			-s worst \
-			-c SYMBOL \
-			-f '%SYMBOL\t%CHROM:%POS:%REF:%ALT[\t%SAMPLE=%GT]\n' \
+			-c Gene \
+			-f '%Gene\t%CHROM:%POS:%REF:%ALT[\t%SAMPLE=%GT]\n' \
 			${file} \
 			> "${pheno}.${category}.${variable}.tsv"
 		"""
@@ -53,8 +53,8 @@ process EXTRACT {
 		#!/bin/bash
 		bcftools +split-vep \
 			-s worst \
-			-c SYMBOL \
-			-f '%SYMBOL\t%CHROM:%POS:%REF:%ALT[\t%SAMPLE=%GT]\n' \
+			-c Gene \
+			-f '%Gene\t%CHROM:%POS:%REF:%ALT[\t%SAMPLE=%GT]\n' \
 			${file} | \
 			summarize_genotypes.awk \
 			> "${pheno}.${category}.${variable}.tsv"
