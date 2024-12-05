@@ -19,9 +19,7 @@ variants_ch = Channel.fromFilePairs(params.vcf, flat: true)
 cases_ch = Channel.fromPath(params.cases)
     | map { [it.simpleName, it] }
 
-category_ch = Channel.of( 'Pathogenic', 'Damaging', 'Splicing',
-                        //   'NotScored', 'Scored',
-                          'High', 'PTV', 'Stop' )
+category_ch = Channel.of(params.categories.split(','))
 variable_ch = Channel.of( 'variants', 'annotations', 'genotypes', 'frequency' )
 
 workflow  {
