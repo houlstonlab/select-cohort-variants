@@ -31,11 +31,15 @@ if (file.size(input_file) > 0) {
   
   # Process data
   d2 <- dplyr::group_by(d, gene = X1)
-  d2 <- dplyr::summarise(d2, het = count_cases(X4),
-                  hom = count_cases(X6),
-                  ch  = count_cases(X4, compound = TRUE))
+  d2 <- dplyr::summarise(
+    d2,
+    nvar = length(unique(X2)),
+    het = count_cases(X4),
+    hom = count_cases(X6),
+    ch  = count_cases(X4, compound = TRUE)
+  )
 } else {
-  d2 <- dplyr::tibble(gene = character(), het = numeric(), hom = numeric(), ch = numeric())
+  d2 <- dplyr::tibble(gene = character(), nvar = numeric(), het = numeric(), hom = numeric(), ch = numeric())
 }
 
 # Write output file
