@@ -16,6 +16,8 @@ URL="https://figshare.com/ndownloader/files"
 wget -c $URL/50487621 -O input/pheno.variants.vcf.gz
 wget -c $URL/50487624 -O input/pheno.variants.vcf.gz.tbi
 wget -c $URL/50385591 -O input/pheno.cases.txt
+echo "cohort,chrom,file,index,samples" > input/cohorts_input.csv
+echo "pheno,,input/pheno.variants.vcf.gz,input/pheno.variants.vcf.gz.tbi,input/pheno.cases.txt" >> input/cohorts_input.csv
 
 # Run nextflow
 module load Nextflow
@@ -23,7 +25,7 @@ module load Nextflow
 # nextflow run houlstonlab/select-cohort-variants -r main \
 nextflow run ../main.nf \
     --output_dir ./results/ \
-    -profile local,gha \
+    -profile local,test \
     -resume
 
 # usage: nextflow run [ local_dir/main.nf | git_url ]  
