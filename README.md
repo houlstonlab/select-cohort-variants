@@ -2,44 +2,48 @@
 
 ### Introduction
 
-This workflow filters and counts variants meeting certain criteria in an annotated VCF. Qualifying
-variants are then tabulated by gene and information about thier frequency in the dataset is 
-exported.
+This workflow filters and counts variants meeting certain criteria in an 
+annotated VCF. Qualifying variants are then tabulated by gene and information 
+about thier frequency in the dataset is exported.
 
 ### Usage
 
-The typical command looks like the following. `--vcf` and `--cases` are required inputs. 
-Different versions of the workflow can be called using `-r` and output directed to `--output_dir`
+The typical command looks like the following. `--cohorts` are required inputs. 
+Different versions of the workflow can be called using `-r` and output directed 
+to `--output_dir`
 
 ```bash
-nextflow run houlstonlab/test-gene-burden \
+nextflow run houlstonlab/select-cohort-variants \
     -r main \
     --output_dir results/ \
-    --vcf input/*.variants.vcf.gz{,.tbi} \
-    --cases input/*.cases.txt
+    --cohorts input/cohorts_input.csv
 ```
 
 ### Inputs & Parameters
 
-- `vcf`  : a VCF file with annotated variants and genotypes
-- `cases`: a list of the cases to consider
-- `genome`: genome version (default is 'hg38')
-- `style` : chromosome names style 'UCSC' or 'NCBI'
-- Genotype filtering parameters
-  - `GQ`: genotype quality (default is 30)
-  - `DP`: call depth (default is 10)
-  - `VAF`: ratio of reads counts between alt and ref (default is 0.4)
-  - `MAF`: minor allele frequency (default is 0.005)
-  - `HWE`: hardy weinberg equilibrium test p-value cut off (default is 1e-5)
-  - `ExcHet`: excess heterozygousity test p-value cut off (default is 0.9)
-- Variant filtering parameters
-  - `gnomADe_AF`: allele frequency GnomAD exomes cut off (default is 0.005)
-  - `MAX_AF`: max population allele frequency GnomAD exomes cut off (default is 0.005)
-  - `DS`: SpliceAI predicted scores cut off (default is 0.8)
-    
+Other paramters include:
+- `genome`    : genome version (default is'hg38') 
+- `style`     : chromosome names style 'UCSC' or 'NCBI'
+- `coding`    : restrict to coding regions. Default `'true'`
+- `categories`: selection categories. One or more of `'Pathogenic,Damaging,Splicing,High,PTV,Stop'`
+- `GQ`        : minimum genotyping quality. Default `> 10`
+- `DP`        : minimum read depth. Default `> 5`
+- `VAF`       : variant allele frequency. Default `> 0.2`
+- `MAF`       : maximum allele frequence. Default `> 0.5` 
+- `PAF`       : maximum pathogenic variants group allele frequence. Default `> 0.5`
+- `HWE`       : cutoff for HWE test. Default `> 1e-5`
+- `ExcHet`    : cutoff for excess heterosygosity. Default `> 0.5`
+- `gnomADe_AF`: maximum allele frequency. Default `> 0.5`
+- `MAX_AF`    : maximum group allele frequence. Default `> 0.5`
+- `DS`        : minimum delta score for spliceAI
+- `CADD`      : minimum CADD score. Defalt `> 5`
+
 ### Output
 
-- `filtered/`  : filtered variants
-- `variants/` : the frequency, annotation and genotypes of qualifying variants
-- `aggregate/`: aggregated variant info by gene
-- The final ouput in `summary/` is a tsv file with `gene`, `het`, `hom`, and `ch`
+- `coordiantes/`: coding gene coordinates
+- `pheno/`    : split vcf file by chromosome
+- `filtered/`   : filtered vcfs
+- `combined/`   : a combined vcf
+- `variants/`   : extracted variant frequence
+- `aggregate/`  : aggregated variant frequency by gene
+- `reports/`    : summary reports
