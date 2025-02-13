@@ -42,7 +42,7 @@ process FILTER {
         bcftools +split-vep -s worst -c CLIN_SIG,IMPACT,CADD_PHRED:Float,gnomADe_AF:Float,MAX_AF:Float ${file} | \
         bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
         bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
-        bcftools view -i 'IMPACT="HIGH"' | \
+        bcftools view -i 'IMPACT="HIGH" || IMPACT="MODERATE"' | \
         bcftools view -i 'CADD_PHRED > ${params.CADD}' | \
         bcftools view -e 'gnomADe_AF > ${params.gnomADe_AF} || MAX_AF > ${params.MAX_AF}' | \
         bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
@@ -72,7 +72,7 @@ process FILTER {
         """
         #!/bin/bash
         # Filter cohort
-        bcftools +split-vep -s worst -c CLIN_SIG,IMPACT,Consequence,CADD_PHRED:Float,gnomADe_AF:Float,MAX_AF:Float ${file} | \
+        bcftools +split-vep -s worst -c CLIN_SIG,Consequence,gnomADe_AF:Float,MAX_AF:Float ${file} | \
         bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
         bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
         bcftools view -i 'Consequence~"stop_gained"' | \
@@ -88,7 +88,7 @@ process FILTER {
         """
         #!/bin/bash
         # Filter cohort
-        bcftools +split-vep -s worst -c CLIN_SIG,IMPACT,Consequence,CADD_PHRED:Float,gnomADe_AF:Float,MAX_AF:Float ${file} | \
+        bcftools +split-vep -s worst -c CLIN_SIG,Consequence,gnomADe_AF:Float,MAX_AF:Float ${file} | \
         bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
         bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
         bcftools view -i 'Consequence~"stop_gained" || Consequence~"frameshift_variant" || Consequence~"splice_acceptor_variant"' | \
@@ -100,31 +100,13 @@ process FILTER {
 
         bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
         """
-    } else if ( category == 'Scored' ) {
+    } else if ( category == 'Rare' ) {
         """
         #!/bin/bash
         # Filter cohort
-        bcftools +split-vep -s worst -c CLIN_SIG,IMPACT,CADD_PHRED:Float,gnomADe_AF:Float,MAX_AF:Float ${file} | \
+        bcftools +split-vep -s worst -c CLIN_SIG,gnomADe_AF:Float,MAX_AF:Float ${file} | \
         bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
         bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
-        bcftools view -i 'IMPACT="HIGH" || IMPACT="MODERATE"' | \
-        bcftools view -i 'CADD_PHRED > ${params.CADD}' | \
-        bcftools view -e 'gnomADe_AF > ${params.gnomADe_AF} || MAX_AF > ${params.MAX_AF}' | \
-        bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
-        bcftools view --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
-
-        tabix ${pheno}.${chrom}.${category}.vcf.gz
-
-        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
-        """
-    } else if ( category == 'NotScored' ) {
-        """
-        #!/bin/bash
-        # Filter cohort
-        bcftools +split-vep -s worst -c CLIN_SIG,IMPACT,CADD_PHRED:Float,gnomADe_AF:Float,MAX_AF:Float ${file} | \
-        bcftools view -e 'MAF > ${params.MAF} || HWE < ${params.HWE} || ExcHet < ${params.ExcHet}' | \
-        bcftools view -e 'CLIN_SIG ~ "conflicting" || CLIN_SIG ~ "benign"' | \
-        bcftools view -i 'IMPACT="HIGH" || IMPACT="MODERATE"' | \
         bcftools view -e 'gnomADe_AF > ${params.gnomADe_AF} || MAX_AF > ${params.MAX_AF}' | \
         bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' | \
         bcftools view --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.${category}.vcf.gz
