@@ -13,15 +13,23 @@ include { REPORT }      from './modules/report.nf'
 // Define input channels
 variants_ch = Channel.fromPath(params.cohorts)
     | splitCsv(header: true, sep: ',')
-    | map { row -> [ row.cohort, file(row.file), file(row.index), file(row.samples) ] }
+    | map { row -> [
+        row.cohort,
+        row.chrom ?: (1..22).collect { "chr$it" } + ['chrX', 'chrY'],
+        file(row.file), file(row.index),
+        file(row.samples)
+    ] }
+    | transpose
 
 genes_coords_ch = Channel.fromPath(params.cohorts)
     | splitCsv(header: true, sep: ',')
     | map { row -> [ 
+        row.cohort,
         row.chrom ?: (1..22).collect { "chr$it" } + ['chrX', 'chrY'],
         params.genome, params.style
     ] }
-    | transpose()
+    | transpose
+    | groupTuple(by: [1,2,3])
 
 category_ch = Channel.of(params.categories.split(','))
 variable_ch = Channel.of( 'variants', 'annotations', 'genotypes', 'frequency' )
@@ -31,9 +39,11 @@ workflow  {
     // Subset, Filter and Extract qualifying variants
     genes_coords_ch
         | COORDINATES
+        | transpose
+        | set { coords }
 
     variants_ch
-        | combine(COORDINATES.out)
+        | combine(coords, by: [0,1])
         | SUBSET
         | combine(category_ch)
         | FILTER
