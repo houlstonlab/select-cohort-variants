@@ -8,10 +8,10 @@ process COORDINATES {
     publishDir("${params.output_dir}/coordiantes", mode: 'copy')
 
     input:
-    tuple val(chrom), val(genome), val(style)
+    tuple val(cohort), val(chrom), val(genome), val(style)
 
     output:
-    tuple val(chrom), path("${chrom}.bed")
+    tuple val(cohort), val(chrom), path("${chrom}.bed")
  
     script:
     """
