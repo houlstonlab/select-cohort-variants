@@ -4,6 +4,7 @@ nextflow.enable.dsl=2
 
 include { COORDINATES } from './modules/coordinates.nf'
 include { SUBSET }      from './modules/subset.nf'
+include { FILL }        from './modules/fill.nf'
 include { FILTER }      from './modules/filter.nf'
 include { COMBINE }     from './modules/combine.nf'
 include { CONVERT }     from './modules/convert.nf'
@@ -42,6 +43,7 @@ workflow  {
         | transpose
         | combine(variants_ch, by: [0,1])
         | SUBSET
+        | ( params.fill ? FILL : map {it} )
         | combine(category_ch)
         | FILTER
         | filter { it[5].toInteger() > 0 }
