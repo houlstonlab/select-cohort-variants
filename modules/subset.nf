@@ -30,8 +30,6 @@ process SUBSET {
     bcftools norm -m -any | \
     bcftools +fill-tags -- -t all | \
     bcftools +setGT -- -t . -n 0 | \
-    bcftools +setGT -- -t q -n 0 -i 'FMT/GQ < ${params.GQ} | FMT/DP < ${params.DP} | VAF < ${params.VAF}' | \
-    bcftools +fill-tags -- -t all | \
     bcftools view -g het --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.vcf.gz
 
     tabix ${pheno}.${chrom}.vcf.gz
