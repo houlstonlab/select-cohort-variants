@@ -8,9 +8,9 @@ process SUBSET {
     publishDir("${params.output_dir}/pheno", mode: 'symlink')
 
     input:
-    tuple val(pheno), val(chrom),
+    tuple val(pheno), val(chrom), path(gene_coords),
           path(file), path(index),
-          path(cases), path(gene_coords)
+          path(cases)
 
     output:
     tuple val(pheno), val(chrom),
