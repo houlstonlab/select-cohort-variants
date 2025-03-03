@@ -1,5 +1,5 @@
 process FILTER {
-    tag "${chrom}:${category}"
+    tag "${pheno}:${chrom}:${category}"
 
     label 'simple'
 
@@ -16,7 +16,7 @@ process FILTER {
     tuple val(pheno), val(chrom), val(category),
           path("${pheno}.${chrom}.${category}.vcf.gz"),
           path("${pheno}.${chrom}.${category}.vcf.gz.tbi"),
-          path("${pheno}.${chrom}.${category}.tsv")
+          env(n_vars)
         
     script:
     if ( category == 'Pathogenic' ) {
@@ -33,7 +33,7 @@ process FILTER {
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
-        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        n_vars=\$(bcftools index -n ${pheno}.${chrom}.${category}.vcf.gz)
         """
     } else if ( category == 'Damaging' ) {
         """
@@ -50,7 +50,7 @@ process FILTER {
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
-        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        n_vars=\$(bcftools index -n ${pheno}.${chrom}.${category}.vcf.gz)
         """
     } else if ( category == 'High' ) {
         """
@@ -66,7 +66,7 @@ process FILTER {
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
-        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        n_vars=\$(bcftools index -n ${pheno}.${chrom}.${category}.vcf.gz)
         """
     } else if ( category == 'Stop' ) {
         """
@@ -82,7 +82,7 @@ process FILTER {
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
-        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        n_vars=\$(bcftools index -n ${pheno}.${chrom}.${category}.vcf.gz)
         """
     } else if ( category == 'PTV' ) {
         """
@@ -98,7 +98,7 @@ process FILTER {
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
-        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        n_vars=\$(bcftools index -n ${pheno}.${chrom}.${category}.vcf.gz)
         """
     } else if ( category == 'Rare' ) {
         """
@@ -113,7 +113,7 @@ process FILTER {
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
-        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        n_vars=\$(bcftools index -n ${pheno}.${chrom}.${category}.vcf.gz)
         """
     } else if ( category == 'Splicing' ) {
         """
@@ -129,7 +129,7 @@ process FILTER {
 
         tabix ${pheno}.${chrom}.${category}.vcf.gz
 
-        bcftools query -f '%ID\n' ${pheno}.${chrom}.${category}.vcf.gz > ${pheno}.${chrom}.${category}.tsv
+        n_vars=\$(bcftools index -n ${pheno}.${chrom}.${category}.vcf.gz)
         """
     }
 }

@@ -1,63 +1,45 @@
 process EXTRACT {
-    tag "${pheno}:${category}"
+    tag "${pheno}:${category}:${variable}"
 
     label 'simple'
 
-    container params.bcftools
+    container params.plink
 
     publishDir("${params.output_dir}/variants", mode: 'copy')
 
     input:
     tuple val(pheno), val(category),
-          path(file), path(index), path(variants),
-          val(variable)
+          path(bim), path(bed), path(fam), path(nosex), path(log),
+		  path(annotations), 
+		  val(variable)
 
     output:
-    tuple val(pheno), val(category), val(variable),
-	      path("${pheno}.${category}.${variable}.tsv")
+    tuple val(pheno), val(category), path(annotations), val(variable),
+	      path("${pheno}.${category}.extracted.${variable}"),
+	      path("${pheno}.${category}.extracted.log")
 
     script:
-    if ( variable == 'variants' ) {
+    if ( variable == 'list' ) {
 		"""
 		#!/bin/bash
-		bcftools +split-vep \
-			-s worst \
-			-c Gene \
-			-f '%Gene\t%CHROM:%POS:%REF:%ALT\n' \
-			${file} \
-			> "${pheno}.${category}.${variable}.tsv"
+		plink --bfile ${bim.baseName} --recode list --out ${pheno}.${category}.extracted
 		"""
-    } else if ( variable == 'annotations' ) {
+    } else if ( variable == 'rlist' ) {
 		"""
 		#!/bin/bash
-		bcftools +split-vep \
-			-s worst \
-			-c Gene \
-			-f '%Gene\t%CHROM:%POS:%REF:%ALT\t%CSQ\n' \
-			-d -A tab \
-			${file} \
-			> "${pheno}.${category}.${variable}.tsv"
+		plink --bfile ${bim.baseName} --recode rlist --out ${pheno}.${category}.extracted
 		"""
-    } else if ( variable == 'genotypes' ) {
+    } else if ( variable == 'snplist' ) {
 		"""
 		#!/bin/bash
-		bcftools +split-vep \
-			-s worst \
-			-c Gene \
-			-f '%Gene\t%CHROM:%POS:%REF:%ALT[\t%SAMPLE=%GT]\n' \
-			${file} \
-			> "${pheno}.${category}.${variable}.tsv"
+		plink --bfile ${bim.baseName} --write-snplist --out ${pheno}.${category}.extracted
 		"""
-    } else if ( variable == 'frequency' ) {
+    } else if ( variable == 'frqx' ) {
 		"""
 		#!/bin/bash
-		bcftools +split-vep \
-			-s worst \
-			-c Gene \
-			-f '%Gene\t%CHROM:%POS:%REF:%ALT[\t%SAMPLE=%GT]\n' \
-			${file} | \
-			summarize_genotypes.awk \
-			> "${pheno}.${category}.${variable}.tsv"
+		plink --bfile ${bim.baseName} --freqx --out ${pheno}.${category}.extracted
 		"""
-    } 
+    } else {
+		println "Variable ${variable} not recognized"
+	}
 }

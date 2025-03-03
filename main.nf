@@ -6,9 +6,9 @@ include { COORDINATES } from './modules/coordinates.nf'
 include { SUBSET }      from './modules/subset.nf'
 include { FILTER }      from './modules/filter.nf'
 include { COMBINE }     from './modules/combine.nf'
+include { CONVERT }     from './modules/convert.nf'
 include { EXTRACT }     from './modules/extract.nf'
 include { AGGREGATE }   from './modules/aggregate.nf'
-include { REPORT }      from './modules/report.nf'
 
 // Define input channels
 variants_ch = Channel.fromPath(params.cohorts)
@@ -32,38 +32,24 @@ genes_coords_ch = Channel.fromPath(params.cohorts)
     | groupTuple(by: [1,2,3])
 
 category_ch = Channel.of(params.categories.split(','))
-variable_ch = Channel.of( 'variants', 'annotations', 'genotypes', 'frequency' )
+variable_ch = Channel.of( 'rlist', 'snplist', 'frqx' )
+// variable_ch = Channel.of( 'annotations', 'list', 'rlist', 'snplist', 'frqx' )
 
 workflow  {
-    // Combine genes, variants, and cases
     // Subset, Filter and Extract qualifying variants
     genes_coords_ch
         | COORDINATES
         | transpose
-        | set { coords }
-
-    variants_ch
-        | combine(coords, by: [0,1])
+        | combine(variants_ch, by: [0,1])
         | SUBSET
         | combine(category_ch)
         | FILTER
+        | filter { it[5].toInteger() > 0 }
         | groupTuple(by: [0,2])
         | COMBINE
+        | CONVERT
         | combine(variable_ch)
         | EXTRACT
-        | filter { it[2] == 'frequency' }
-        | multiMap {
-            cat: it
-            all: [it[0], 'ALL', it[2], it[3]]
-        } 
-        | set { variants }
-
-    // Concatenate and group genotypes by category or 'all'
-    variants.cat 
-        | concat(variants.all) 
-        | groupTuple(by: [0,1,2])
+        | filter { it[3] == 'rlist' } 
         | AGGREGATE
-
-    // Stats
-    COMBINE.out | REPORT
 }
