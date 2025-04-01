@@ -28,9 +28,9 @@ process SUBSET {
         -g het \
         ${file} | \
     bcftools norm -m -any | \
-    bcftools +fill-tags -- -t all | \
     bcftools +setGT -- -t . -n 0 | \
-    bcftools view -g het --threads ${task.cpu} -Oz -o ${pheno}.${chrom}.vcf.gz
+    bcftools +fill-tags -- -t all | \
+    bcftools view -g het --threads ${task.cpus} -Oz -o ${pheno}.${chrom}.vcf.gz
 
     tabix ${pheno}.${chrom}.vcf.gz
     """
